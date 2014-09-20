@@ -26,7 +26,11 @@ makeCacheMatrix <- function(x = matrix()) {
   list(set = set, get = get,
        setInverse = setInverse,
        getInverse = getInverse) 
-  
+  setmean <- function(mean) m <<- mean
+  getmean <- function() m
+  list(set = set, get = get,
+       setmean = setmean,
+       getmean = getmean) 
 }
 
 ##
@@ -49,8 +53,7 @@ cacheSolve <- function(x, ...) {
   m <- solve(data, ...)
   ##  Cache the inverse before returning
   x$setInverse(m)
-  m
-  
+  m 
 }
 
 ## 
@@ -73,7 +76,7 @@ makeVector <- function(x = numeric()) {
 }
 
 ##
-## Sample code to return the cacehd mean value if it existis
+## Sample code to return the cached mean value if it existis
 ##  or calculate the mean if it does not
 ##
 cachemean <- function(x, ...) {
@@ -81,14 +84,15 @@ cachemean <- function(x, ...) {
   m <- x$getmean()
   ## If it is not NULL (if it exists) 
   ##    return the cahced value
-  if(!is.null(m)) {
-    message("getting cached data")
-    return(m)
+    if(!is.null(m)) {
+      message("getting cached data")
+      return(m)
+    }
+    ## If the cached value is NULL, calculate the mean
+    ##  and set the cached value
+    data <- x$get()
+    m <- mean(data, ...)
+    x$setmean(m)
+    m
   }
-  ## If the cached value is NULL, calculate the mean
-  ##  and set the cached value
-  data <- x$get()
-  m <- mean(data, ...)
-  x$setmean(m)
-  m
-}
+  
